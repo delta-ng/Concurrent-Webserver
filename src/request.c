@@ -1,7 +1,7 @@
 #include "io_helper.h"
 #include "request.h"
-#include <pthread.h>
-#include <time.h>
+
+//
 // Some of this code stolen from Bryant/O'Halloran
 // Hopefully this is not a problem ... :)
 //
@@ -140,95 +140,42 @@ void request_serve_static(int fd, char *filename, int filesize) {
     write_or_die(fd, srcp, filesize);
     munmap_or_die(srcp, filesize);
 }
-struct thred {
-    char *method;
-    char *uri;
-    char *filename;
-    char *cgiargs;
-    int fd;
-};
-void myThreadFun(struct thred* cool) {
-    char *method=cool->method;
-    char *uri=cool->uri;
-    char *filename=cool->filename;
-    char *cgiargs=cool->cgiargs;
-    int fd=cool->fd;
+
+// handle a request
+void request_handle(int fd) {
     int is_static;
     struct stat sbuf;
-    printf("\n %s %d \n",method,fd);
+    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
+    char filename[MAXBUF], cgiargs[MAXBUF];
+    
+    readline_or_die(fd, buf, MAXBUF);
+    sscanf(buf, "%s %s %s", method, uri, version);
+    printf("method:%s uri:%s version:%s\n", method, uri, version);
+    printf("%s \n",buf);
+    
     if (strcasecmp(method, "GET")) {
-    request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
-    return;
+	request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
+	return;
     }
     request_read_headers(fd);
     
     is_static = request_parse_uri(uri, filename, cgiargs);
     if (stat(filename, &sbuf) < 0) {
-    request_error(fd, filename, "404", "Not found", "server could not find this file");
-    return;
+	request_error(fd, filename, "404", "Not found", "server could not find this file");
+	return;
     }
     
     if (is_static) {
-    if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
-        request_error(fd, filename, "403", "Forbidden", "server could not read this file");
-        return;
-    }
-    request_serve_static(fd, filename, sbuf.st_size);
+	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
+	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
+	    return;
+	}
+	request_serve_static(fd, filename, sbuf.st_size);
     } else {
-    if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
-        request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
-        return;
-    }
-    request_serve_dynamic(fd, filename, cgiargs);
+	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
+	    request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
+	    return;
+	}
+	request_serve_dynamic(fd, filename, cgiargs);
     }
 }
-
-// handle a request
-void request_handle(int fd) {
-    pthread_t thread_id1,thread_id2;
-    int t1=1,t2=1;
-    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
-    char filename[MAXBUF], cgiargs[MAXBUF];
-    struct thred* cool=(struct thred*)malloc(sizeof(struct thred));
-    printf("Before 1st Thread");
-    time_t start=time(NULL);
-    time_t end;
-    while(1) {
-        readline_or_die(fd, buf, MAXBUF);
-        sscanf(buf, "%s %s %s", method, uri, version);
-        // printf("method:%s uri:%s version:%s\n", method, uri, version);
-        if (strcasecmp(method, "GET")==0) {
-        cool->method=method;
-        cool->uri=uri;
-        cool->filename=filename;
-        cool->cgiargs=cgiargs;
-        cool->fd=fd;
-        if(t1) {
-            t1=pthread_create(&thread_id1, NULL, myThreadFun, cool);
-            printf("1st Thread");
-        }
-        else if(t2){
-            printf("Before 2nd Thread");
-            t2=pthread_create(&thread_id2, NULL, myThreadFun, cool);
-            printf("2nd Thread");
-        }
-        end=time(NULL);
-        if(t1==0 && t2==0) {
-            pthread_join(thread_id1, NULL);
-            pthread_join(thread_id2, NULL);
-            t1=1;
-            t2=1;
-            start=time(NULL);
-        }
-        else if(t1==0 && end-start>100) {
-            pthread_join(thread_id1, NULL);
-            t1=1;
-        }
-        else if(t2==0 && end-start>100){
-            pthread_join(thread_id2, NULL);
-            t2=1;
-        }
-        printf("\n%d %d\n",t1,t2);
-        }
-    } 
-}    
