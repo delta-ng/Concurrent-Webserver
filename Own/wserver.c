@@ -16,7 +16,7 @@ int main(int argc, char *argv[]) {
     char *root_dir = default_root;
     int port = 10000;
     
-    while ((d = getopt(argc, argv, "d:p:b:")) != -1)
+    while ((d = getopt(argc, argv, "d:p:t:")) != -1)
 	switch (d) {
 	case 'd':
 	    root_dir = optarg;
@@ -24,40 +24,52 @@ int main(int argc, char *argv[]) {
 	case 'p':
 	    port = atoi(optarg);
 	    break;
-	case 'b':
+	case 't':
 		MAXBUF = atoi(optarg);
+		break;
 	default:
-	    fprintf(stderr, "usage: wserver [-d basedir] [-p port]\n");
+		// printf("%c",d);
+	    fprintf(stderr, "usage: wserver [-d basedir] [-p port] [-t threads]\n");
 	    exit(1);
 	}
 
     // run out of this directory
     chdir_or_die(root_dir);
-    int t[MAXBUF];
-    int c[MAXBUF];
+    int *t=malloc((MAXBUF+1)*sizeof(int));
+    int *c=calloc(MAXBUF+1,sizeof(int));
     // now, get to work
     int listen_fd = open_listen_fd_or_die(port);
-	pthread_t worker_thread[MAXBUF];
+	pthread_t *worker_thread = malloc((MAXBUF+1)*sizeof(pthread_t));
     while (1) {
 	struct sockaddr_in client_addr;
 	int client_len = sizeof(client_addr);
 	int conn_fd = accept_or_die(listen_fd, (sockaddr_t *) &client_addr, (socklen_t *) &client_len);
 	new_conn = malloc(1);
+	int i;
 	*new_conn = conn_fd;
-	// start = time(NULL);
-	for(int i=0;i<MAXBUF;i++) {
-	if(t[i]) {
-		t[i]=pthread_create(&worker_thread, NULL, request_handle, (void*) new_conn);
-		c[i]=*new_conn;
-		break;
-	}
-		if(i==MAXBUF-1) {
-			for(int i=0;i<MAXBUF;i++) {
-				pthread_join(worker_thread[i], NULL);
-				close_or_die(c[i]);
-			}
+	if(conn_fd!=-1) {
+		// start = time(NULL);
+		for(i=1;i<MAXBUF+1;i++) {
+		printf("%d\n",i);
+		if(*(t+i)!=0) {
+			*(t+i)=pthread_create(worker_thread+i, NULL, request_handle, (void*) new_conn);
+			*(c+i)=conn_fd;
+			printf("%d %d\n",i,conn_fd);
+			// printf("%d\n",*(c+i));
+			break;
 		}
-    }
+		if(i==MAXBUF) {
+				for(int j=1;j<MAXBUF+1;j++) {
+					pthread_join(*(worker_thread+j), NULL);
+					// if(*(c+j) != 0) {
+					// 	// printf("%d\n",*(c+j));
+					// 	close_or_die(*(c+j));
+					// }
+					*(t+j)=1;
+				}
+			}
+	    }
+		}
 	}
     return 0;
 }
