@@ -17,13 +17,13 @@ double get_seconds() {
     struct timeval t;
     int rc = gettimeofday(&t, NULL);
     assert(rc == 0);
-    return (double) ((double)t.tv_sec + (double)t.tv_usec / 1e6);
+    return (double) ((double)t.tv_sec);
 }
 
 
 int main(int argc, char *argv[]) {
     // Extract arguments
-    double spin_for = 0.0;
+    double spin_for = 60.0;
     char *buf;
     if ((buf = getenv("QUERY_STRING")) != NULL) {
 	// just expecting a single number
@@ -34,13 +34,13 @@ int main(int argc, char *argv[]) {
     while ((get_seconds() - t1) < spin_for)
 	sleep(1);
     double t2 = get_seconds();
-    
+    sleep(100);
     /* Make the response body */
     char content[MAXBUF];
     sprintf(content, "<p>Welcome to the CGI program (%s)</p>\r\n", buf);
     sprintf(content, "%s<p>My only purpose is to waste time on the server!</p>\r\n", content);
-    sprintf(content, "%s<p>I spun for %.2f seconds</p>\r\n", content, t2 - t1);
-    
+    sprintf(content, "%s<p>I spun for %.2f seconds</p>\r\n", content,get_seconds()- t1);
+    // printf("%d",get_seconds()- t1);
     /* Generate the HTTP response */
     printf("Content-length: %lu\r\n", strlen(content));
     printf("Content-type: text/html\r\n\r\n");

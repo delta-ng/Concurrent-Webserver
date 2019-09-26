@@ -1,3 +1,5 @@
+// #include<stdio.h>
+// #include<stdlib.h>
 //
 // client.c: A very, very primitive HTTP client.
 // 
@@ -6,7 +8,7 @@
 //
 // Sends one HTTP request to the specified HTTP server.
 // Prints out the HTTP response.
-//
+//8
 // For testing your server, you will want to modify this client.  
 // For example:
 // You may want to make this multi-threaded so that you can 
@@ -20,7 +22,7 @@
 //
 
 #include "io_helper.h"
-
+#include<pthread.h>
 #define MAXBUF (8192)
 
 //
@@ -66,27 +68,60 @@ void client_print(int fd) {
     }
 }
 
+struct threadd{
+    int clientfd;
+    char *filename;
+};
+void *dos(struct threadd *new){
+    // client_send(new->clientfd, new->filename);
+    // client_print(new->clientfd);
+    return NULL;
+}
+
+
 int main(int argc, char *argv[]) {
-    char *host, *filename;
-    int port;
+    char *host;
+    int port, no_of_requests;
     int clientfd;
     
-    if (argc != 4) {
-	fprintf(stderr, "Usage: %s <host> <port> <filename>\n", argv[0]);
+    if (argc < 5) {
+	fprintf(stderr, "Usage: %s <host> <port> <no_of_requests> <filenames>\n", argv[0]);
 	exit(1);
     }
     
     host = argv[1];
     port = atoi(argv[2]);
-    filename = argv[3];
+    no_of_requests = atoi(argv[3]);
+    char *filenames[no_of_requests];
     
+    for(int i = 0; i<no_of_requests; i++){
+        filenames[i]=argv[4+i];
+    }
+    // for(int i = 0; i<no_of_requests; i++){
+    //     printf("%s\t%s\n",argv[4+i],filenames[i]);
+    // }
+    // return 0;
     /* Open a single connection to the specified host and port */
-    clientfd = open_client_fd_or_die(host, port);
-    
-    client_send(clientfd, filename);
-    client_print(clientfd);
-    
-    close_or_die(clientfd);
-    
+    // st = (pthread_t*)malloc(no_of_requests*sizeof(pthread_t))
+    for (int i = 0; i < no_of_requests; i++)
+    {
+        /* code */
+        // struct threadd *new = malloc(sizeof(struct threadd));
+        clientfd = open_client_fd_or_die(host, port);
+
+        // new->clientfd = clientfd;
+        // new->filename = malloc(sizeof(filenames[i]));
+        // new->filename = filenames[i];
+        client_send(clientfd, filenames[i]);
+        client_print(clientfd);
+        // pthread_create(st+i , NULL, dos , new);
+        // sleep(10);
+        close_or_die(clientfd);
+    }
+
+    // for (int i = 0; i<no_of_requests;i++){
+    //     pthread_join(*(st+i),NULL);
+    // }
     exit(0);
 }
+
