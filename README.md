@@ -29,7 +29,8 @@ follows.
 - **port**: the port number that the web server should listen on; the basic web
   server already handles this argument. Default: 10000.
 - **threads**: the number of worker threads that should be created within the web
-  server. Must be a positive integer. Default: 1.
+  server. Must be a positive integer. Default: 4.
+- **buffers**: the number of request connections that can be accepted at one time. Must be a positive integer. Note that it is not an error for more or less threads to be created than buffers. Default: 8.
 
 For example, you could run your program as:
 ```
