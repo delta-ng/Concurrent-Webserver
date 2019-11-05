@@ -83,7 +83,7 @@ int main(int argc, char *argv[]) {
     char *root_dir = default_root;
     int port = 10000;
     
-    while ((d = getopt(argc, argv, "d:p:t:b:")) != -1)
+    while ((d = getopt(argc, argv, "d:p:t:b:")) != -1){
 	switch (d) {
 	case 'd':
 	    root_dir = optarg;
@@ -102,8 +102,8 @@ int main(int argc, char *argv[]) {
 	    fprintf(stderr, "usage: wserver [-d basedir] [-p port] [-t threads] [-b buffer]\n");
 	    exit(1);
 	}
-
-	srand(time(NULL));
+    }
+    srand(time(NULL));
 	// printf("%d %d\n",MAXTH,MAXBUF);
     thread_pool *pool = pool_init(MAXTH,MAXBUF);
     printf("Testing threadpool of %d threads.\n", get_max_threads(pool));
