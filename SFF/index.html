@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		html,body {
+		  height: 100%;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  background-color: #AEB6BF;
+		}
+
+		.count,.count1{
+		  width: 200px;
+		  height: 200px;
+		  background: #3498DB;
+		  border-radius: 50%;
+		  border: 4px solid #154360;
+		  display: flex;
+		  justify-content: center;
+		  align-items: center;
+		  color: white;
+		  font-weight: bold;
+		  font-size: 40px;
+		  font-family: verdana;
+		  float: left;
+		  margin: 30px;
+		  text-shadow: 1px 1px black;
+		  -webkit-box-shadow: 0px 0px 72px -9px #AED6F1;
+		  -moz-box-shadow: 0px 0px 72px -9px #AED6F1;
+		  box-shadow: 0px 0px 72px -9px #AED6F1;
+		}
+
+		#animate,#animate1{
+		  width: 50px;
+		  height: 50px;
+		  background: #3498DB;
+		  border-radius: 50%;
+		  position: relative;
+		}
+	</style>
+</head>
+<body onload="start()">
+
+<!-- <p>Click the button to wait 3 seconds, then alert "Hello".</p> -->
+<div id ="animate"></div>
+<div class="count">1000</div>
+<div id ="animate1"></div>
+<!-- <div class="count">60</div>  -->
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>
+	function start() {
+		myMove();
+		myMove1();
+	}
+	function myMove() {
+	  var elem = document.getElementById("animate");   
+	  var pos = 0;
+	  var id = setInterval(frame, 5);
+	  var direct = 0;
+	  function frame() {
+	  	if(pos==350) {
+	  		direct=1;
+	  	}
+	  	else {
+	  		if(pos==0) {
+	  			direct=0;
+	  		}
+	  	}
+	    if (direct==1 && pos > 0) {
+	      pos--;
+	      elem.style.right = pos + "px"; 
+	    } else {
+	      pos++; 
+	      // elem.style.top = pos + "px"; 
+	      elem.style.right = pos + "px"; 
+	    }
+	  }
+	}
+	function myMove1() {
+	  var elem = document.getElementById("animate1");   
+	  var pos = 0;
+	  var id = setInterval(frame, 5);
+	  var direct = 0;
+	  function frame() {
+	    if(pos==350) {
+	  		direct=1;
+	  	}
+	  	else {
+	  		if(pos==0) {
+	  			direct=0;
+	  		}
+	  	}
+	    if (direct==1 && pos > 0) {
+	      pos--;
+	      elem.style.left = pos + "px"; 
+	    }  else {
+	      pos++; 
+	      // elem.style.top = pos + "px"; 
+	      elem.style.left = pos + "px"; 
+	    }
+	  }
+	}
+</script>
+<script>
+// function myFunction() {
+//   setTimeout(function(){ alert("Hello"); }, 20000);
+// }
+$(document).ready(function() {
+  // setTimeout(tim, 30000);
+  // function tim() {
+  //       	alert("Time's Up");
+  //   }
+  var counters = $(".count");
+  // var counters_1 = $(".count1");
+  var countersQuantity = counters.length;
+  // var countersQuantity_1 = counters.length;
+  // var counter_1 = [];
+  var counter = [];
+  // for (k = 0; k < countersQuantity_1; k++) {
+  // 		counter_1[k] = parseInt(counters_1[k].innerHTML);
+  // 	}
+  for (i = 0; i < countersQuantity; i++) {
+	    counter[i] = parseInt(counters[i].innerHTML);
+	}
+  var count = function(start, value, id) {
+    var localStart = start;
+    setInterval(function() {
+      if (localStart < value) {
+        localStart++;
+        counters[id].innerHTML = localStart;
+      }
+    }, 40);
+  }
+  // for (k = 0; k < countersQuantity_1; k++) {
+	  for (j = 0; j < countersQuantity; j++) {
+	  	// counters_1[k].innerHTML = k;
+	    count(0, counter[j], j);
+	  }
+	// alert("Hello! I am an alert box!!");
+	// }
+});
+</script>
+</body>
+</html>

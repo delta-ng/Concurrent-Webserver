@@ -145,7 +145,34 @@ void request_serve_static(int fd, char *filename, int filesize) {
     write_or_die(fd, srcp, filesize);
     munmap_or_die(srcp, filesize);
 }
-
+int getsize(void *fd_rec) {
+    int fd = *(int*)fd_rec;
+    int is_static;
+    struct stat sbuf;
+    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
+    char filename[MAXBUF], cgiargs[MAXBUF];
+    
+    readline_or_die(fd, buf, MAXBUF);
+    sscanf(buf, "%s %s %s", method, uri, version);
+    printf("method:%s uri:%s version:%s\n", method, uri, version);
+    
+    if (strcasecmp(method, "GET")) {
+    request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
+    return 0;
+    }
+    request_read_headers(fd);
+    struct stat stats;
+    is_static = request_parse_uri(uri, filename, cgiargs);
+    if (stat(filename, &stats) == 0)
+    {
+        return stats.st_size;
+    }
+    else
+    {
+        printf("Unable to get file properties.\n");
+        return -1;
+    }
+}
 // handle a request
 void *request_handle(void *fd_rec) {
     int fd = *(int*)fd_rec;
@@ -175,21 +202,7 @@ void *request_handle(void *fd_rec) {
     //     fclose(fp); 
     // } 
     // printf("%s\n",filename);
-    struct stat stats;
     is_static = request_parse_uri(uri, filename, cgiargs);
-    if (stat(filename, &stats) == 0)
-    {
-        printf("%lld\n",stats.st_size);
-    }
-    else
-    {
-        printf("Unable to get file properties.\n");
-    }
-    if (stat(filename, &sbuf) < 0) {
-	request_error(fd, filename, "404", "Not found", "server could not find this file");
-	return 0;
-    }
-    
     if (is_static) {
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
 	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
