@@ -20,7 +20,7 @@ struct q_node{
     void *(*routine)(void *);
     // void *arg;
     int size;
-    struct info* req;
+    struct info req;
 };
 
 // #include<stdio.h>
@@ -79,10 +79,15 @@ Heap *CreateHeap(int capacity){
 void heapify_bottom_top(Heap *h,int index){
     struct q_node temp;
     int parent_node = (index-1)/2;
-
+    // printf("\nParent : %d\n",parent_node);
     if(h->arr[parent_node].size > h->arr[index].size){
         //swap and recursive call
+        // temp = h->arr[index];
+        // printf("%d %d\n",(temp.req)->fd,temp.size);
+        // printf("%d\n",(temp.req)->fd);
         temp = h->arr[parent_node];
+        // printf("%d %d\n",(temp.req)->fd,temp.size);
+        // printf("%d\n",(temp.req)->fd);
         h->arr[parent_node] = h->arr[index];
         h->arr[index] = temp;
         heapify_bottom_top(h,parent_node);
@@ -117,10 +122,16 @@ void heapify_top_bottom(Heap *h, int parent_node){
     }
 }
 void insert(Heap *h, struct q_node key){
+    // struct info* temp;
     if( h->count < h->capacity){
         h->arr[h->count] = key;
+        // temp=key.req;
+        // printf("Key :%d\n",temp->fd);
+        // temp=(h->arr[0]).req;
+        // printf("First :%d\n",temp->fd);
         heapify_bottom_top(h, h->count);
         h->count++;
+        // printf("%d\n",h->count);
     }
 }
 
@@ -167,11 +178,13 @@ int get_count(struct thread_pool *pool){
 void print_heap(struct thread_pool *pool) {
     struct Heap *h=pool->heap;
     int i;
+    struct info temp;
     printf("____________Print Heap_____________\n");
     for(i=0;i< h->count;i++){
-        printf("-> %d ",(h->arr[i]).size);
+        temp=(h->arr[i]).req;
+        printf("-> Size:%d FD:%d",(h->arr[i]).size,(temp.fd));
     }
-    printf("->__/\\__\n");
+    printf("-> END \n");
 }
 // int get_head(struct thread_pool *pool){
 //     return (pool->q_head)% pool->TASK_Q_MAX;
@@ -199,14 +212,14 @@ void *worker_func(void *pool_arg){
         //assert(pool->q_head != pool->q_tail);
         task_picked = PopMin(pool->heap);
         pool->scheduled++; //task scheduled
-        printf("Size: %d\n",task_picked.size);
+        // printf("Size: %d\n",task_picked.size);
         pthread_mutex_unlock(&pool->mutex);
 
-        task_picked.routine(task_picked.req);
+        task_picked.routine(&task_picked.req);
 
         pthread_mutex_lock(&pool->mutex);
         
-        printf("Work Done \n");
+        printf("Work Done %d",(task_picked.req).fd);
         
         pool->scheduled--;
 
@@ -239,8 +252,9 @@ void pool_add_task(struct thread_pool *pool, void *(*routine)(void*), void *arg,
     task.routine = routine;
     // task.arg = arg;
     task.size = temp->size;
-    task.req = temp;
+    task.req = *temp;
     insert(pool->heap,task);
+    print_heap(pool);
     pthread_mutex_unlock(&pool->mutex);
 }
 

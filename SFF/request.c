@@ -106,9 +106,8 @@ void request_serve_dynamic(int fd, char *filename, char *cgiargs) {
     sprintf(buf, ""
 	    "HTTP/1.0 200 OK\r\n"
 	    "Server: OSTEP WebServer\r\n");
-    
+    // printf("%d\n",fd);
     write_or_die(fd, buf, strlen(buf));
-    printf("%d\n",fd);
     if (fork_or_die() == 0) {                        // child
 	setenv_or_die("QUERY_STRING", cgiargs, 1);   // args to cgi go here
 	dup2_or_die(fd, STDOUT_FILENO);              // make cgi writes go to socket (not screen)
@@ -199,7 +198,7 @@ void * request_handle(void *tem) {
     strcpy(method,tempo->method);
     strcpy(uri,tempo->uri);
     strcpy(version,tempo->version);
-    
+    struct stat sbuf;
     if (strcasecmp(method, "GET")) {
 	request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
 	return 0;
@@ -218,19 +217,23 @@ void * request_handle(void *tem) {
     // } 
     // printf("%s\n",filename);
     // is_static = request_parse_uri(uri, filename, cgiargs);
+    if (stat(filename, &sbuf) < 0) {
+    request_error(fd, filename, "404", "Not found", "server could not find this file");
+    return 0;
+    }
     if (is_static) {
-	// if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
-	//     request_error(fd, filename, "403", "Forbidden", "server could not read this file");
-	//     printf("Hello\n");
- //        return 0;
-	// }
+	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
+	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
+	    // printf("Hello\n");
+        return 0;
+	}
 	request_serve_static(fd, filename, tempo->size);
     close_or_die(fd);
     } else {
-	// if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
-	//     request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
-	//     return 0;
-	// }
+	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
+	    request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
+	    return 0;
+	}
 	request_serve_dynamic(fd, filename, cgiargs);
     close_or_die(fd);
     }

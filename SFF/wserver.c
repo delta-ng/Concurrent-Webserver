@@ -135,7 +135,7 @@ int main(int argc, char *argv[]) {
         pool_add_task(pool,request_handle, (void *)new_conn,temp);
         // printf("Schedule: %d\n Head: %d\n Tail: %d\n",get_schedule(pool),get_head(pool),get_tail(pool));
         // printf("%d %d\n",get_count(pool),getsize((void *)new_conn));
-        print_heap(pool);
+        // print_heap(pool);
         }
     }
   // printf("All scheduled!\n");
