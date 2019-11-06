@@ -21,19 +21,27 @@ int checkFileExtension(char* filename){
             j++;
         }
     }
-    char *extension=malloc(sizeof(char)*4);
-    extension="o";
-    int flag=0;
-    for (int i= 0; i <strlen(extension) ; i++)
-    {
-        if(s[j-1]!=extension[i]){
-            flag=1;
-            break;
-        }
-        j--;
+    char **extension=malloc(sizeof(char*)*3);
+    for (int i = 0; i < 3; i++) {
+    /* code */
+        extension[i]=malloc(sizeof(char)*10);
     }
-    if(j==0  && flag==0){
-        return 1;
+    extension[0][0]='o';
+    extension[1][0]='c';
+    extension[2][0]='o';
+    extension[2][1]='u';
+    extension[2][2]='t';
+    for (int i = 0; i < strlen(s)/2; i++) {
+        char temp=s[i];
+        s[i]=s[strlen(s)-i-1];
+        s[strlen(s)-i-1]=temp;
+    }
+    int flag1=0;
+    for (int k = 0; k < 3; k++) {
+        if (strcmp(s,extension[k])==0) {
+            /* code */
+            return 1;
+        }
     }
     return 0;
 }
@@ -189,8 +197,8 @@ void* getsize(void *fd_rec) {
     printf("method:%s uri:%s version:%s\n", method, uri, version);
     struct info temp;
     if (strcasecmp(method, "GET")) {
-    request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
-    return &temp;
+        request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
+        return (void *)&temp;
     }
     request_read_headers(fd);
     struct stat stats;
@@ -244,7 +252,7 @@ void * request_handle(void *tem) {
     // printf("%s\n",filename);
     // is_static = request_parse_uri(uri, filename, cgiargs);
     if(checkFileExtension(filename)){
-        request_error(fd, filename, "403", "Forbidden", "server could not read this file");
+        request_error(fd, filename, "403", "Forbidden", "This file is Prohibited");
         close_or_die(fd);
         return 0;
     }
@@ -265,16 +273,16 @@ void * request_handle(void *tem) {
         close_or_die(fd);
         return 0;
 	}
+    printf("Work Started %d\n",fd);
 	request_serve_static(fd, filename, tempo->size);
-    printf("Work Done %d\n",fd);
     close_or_die(fd);
     } else {
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
 	    request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
 	    return 0;
 	}
+    printf("Work Started %d\n",fd);
 	request_serve_dynamic(fd, filename, cgiargs);
-    printf("Work Done %d\n",fd);
     close_or_die(fd);
     }
 

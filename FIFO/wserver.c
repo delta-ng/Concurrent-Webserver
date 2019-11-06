@@ -121,7 +121,7 @@ int main(int argc, char *argv[]) {
 	new_conn = malloc(1);
 	*new_conn = conn_fd;
     if(conn_fd!=-1) {
-        printf("Start Work\n");
+        printf("Start Work %d\n",conn_fd);
         pool_add_task(pool,request_handle, (void *)new_conn);
         // printf("Schedule: %d\n Head: %d\n Tail: %d\n",get_schedule(pool),get_head(pool),get_tail(pool));
         }

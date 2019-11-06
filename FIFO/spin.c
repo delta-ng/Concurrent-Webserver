@@ -34,7 +34,7 @@ int main(int argc, char *argv[]) {
     while ((get_seconds() - t1) < spin_for)
 	sleep(1);
     double t2 = get_seconds();
-    sleep(100);
+    sleep(30);
     /* Make the response body */
     char content[MAXBUF];
     sprintf(content, "<p>Welcome to the CGI program (%s)</p>\r\n", buf);

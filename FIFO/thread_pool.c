@@ -68,7 +68,7 @@ void *worker_func(void *pool_arg){
 
         pthread_mutex_lock(&pool->mutex);
         
-        printf("Work Done \n");
+        
         
         pool->scheduled--;
 
