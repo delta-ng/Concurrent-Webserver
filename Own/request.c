@@ -203,5 +203,6 @@ void *request_handle(void *fd_rec) {
 	}
 	request_serve_dynamic(fd, filename, cgiargs);
     }
+    close_or_die(fd);
 return 0;    
 }

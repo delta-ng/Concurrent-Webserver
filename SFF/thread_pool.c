@@ -169,7 +169,7 @@ void print_heap(struct thread_pool *pool) {
     int i;
     printf("____________Print Heap_____________\n");
     for(i=0;i< h->count;i++){
-        printf("-> %d ",h->arr[i]);
+        printf("-> %d ",(h->arr[i]).size);
     }
     printf("->__/\\__\n");
 }
