@@ -4,7 +4,7 @@
 #include <stdlib.h> 
 #include <unistd.h>
 #include <sys/stat.h>
-//
+#include <string.h>
 // Some of this code stolen from Bryant/O'Halloran
 // Hopefully this is not a problem ... :)
 //
@@ -145,51 +145,66 @@ void request_serve_static(int fd, char *filename, int filesize) {
     write_or_die(fd, srcp, filesize);
     munmap_or_die(srcp, filesize);
 }
-int getsize(void *fd_rec) {
+struct info {
+    int is_static;
+    int size;
+    int fd;
+    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
+    char filename[MAXBUF], cgiargs[MAXBUF];
+};
+void* getsize(void *fd_rec) {
     int fd = *(int*)fd_rec;
     int is_static;
-    struct stat sbuf;
+    // struct stat sbuf;
     char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
     char filename[MAXBUF], cgiargs[MAXBUF];
     
     readline_or_die(fd, buf, MAXBUF);
     sscanf(buf, "%s %s %s", method, uri, version);
     printf("method:%s uri:%s version:%s\n", method, uri, version);
-    
+    struct info temp;
     if (strcasecmp(method, "GET")) {
     request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
-    return 0;
+    return &temp;
     }
     request_read_headers(fd);
     struct stat stats;
     is_static = request_parse_uri(uri, filename, cgiargs);
-    if (stat(filename, &stats) == 0)
-    {
-        return stats.st_size;
-    }
-    else
-    {
-        printf("Unable to get file properties.\n");
-        return -1;
-    }
+    stat(filename, &stats);
+    
+    temp.fd=fd;
+    temp.is_static= is_static;
+    strcpy(temp.buf,buf);
+    strcpy(temp.filename,filename);
+    strcpy(temp.cgiargs,cgiargs);
+    strcpy(temp.method,method);
+    strcpy(temp.uri,uri);
+    strcpy(temp.version,version);
+    temp.size=stats.st_size;
+    return (void *)&temp;
 }
 // handle a request
-void *request_handle(void *fd_rec) {
-    int fd = *(int*)fd_rec;
+void * request_handle(void *tem) {
+    struct info*tempo= (struct info*) tem; 
+    int fd;
     int is_static;
-    struct stat sbuf;
+    // struct stat sbuf;
     char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
     char filename[MAXBUF], cgiargs[MAXBUF];
-    
-    readline_or_die(fd, buf, MAXBUF);
-    sscanf(buf, "%s %s %s", method, uri, version);
-    printf("method:%s uri:%s version:%s\n", method, uri, version);
+    fd=tempo->fd;
+    is_static=tempo->is_static;
+    strcpy(buf,tempo->buf);
+    strcpy(filename,tempo->filename);
+    strcpy(cgiargs,tempo->cgiargs);
+    strcpy(method,tempo->method);
+    strcpy(uri,tempo->uri);
+    strcpy(version,tempo->version);
     
     if (strcasecmp(method, "GET")) {
 	request_error(fd, method, "501", "Not Implemented", "server does not implement this method");
 	return 0;
     }
-    request_read_headers(fd);
+    // request_read_headers(fd);
     // FILE *fp = fopen("test.txt", "w"); 
     // if (fp == NULL) 
     // { 
@@ -202,18 +217,19 @@ void *request_handle(void *fd_rec) {
     //     fclose(fp); 
     // } 
     // printf("%s\n",filename);
-    is_static = request_parse_uri(uri, filename, cgiargs);
+    // is_static = request_parse_uri(uri, filename, cgiargs);
     if (is_static) {
-	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
-	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
-	    return 0;
-	}
-	request_serve_static(fd, filename, sbuf.st_size);
+	// if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
+	//     request_error(fd, filename, "403", "Forbidden", "server could not read this file");
+	//     printf("Hello\n");
+ //        return 0;
+	// }
+	request_serve_static(fd, filename, tempo->size);
     } else {
-	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
-	    request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
-	    return 0;
-	}
+	// if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
+	//     request_error(fd, filename, "403", "Forbidden", "server could not run this CGI program");
+	//     return 0;
+	// }
 	request_serve_dynamic(fd, filename, cgiargs);
     }
 return 0;    

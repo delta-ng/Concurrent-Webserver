@@ -6,11 +6,23 @@
 #include "io_helper.h"
 #include "thread_pool.h"
 
+#define MAXBUF (8192)
+
+struct info {
+    int is_static;
+    int size;
+    int fd;
+    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
+    char filename[MAXBUF], cgiargs[MAXBUF];
+};
+
 struct q_node{
     void *(*routine)(void *);
-    void *arg;
+    // void *arg;
     int size;
+    struct info* req;
 };
+
 // #include<stdio.h>
 // #include<stdlib.h>
 /*
@@ -118,7 +130,7 @@ struct q_node PopMin(Heap *h){
     struct q_node pop;
     if(h->count==0){
         printf("\n__Heap is Empty__\n");
-        return NULL;
+        return pop;
     }
     // replace first node by last and delete last
     pop = h->arr[0];
@@ -127,14 +139,6 @@ struct q_node PopMin(Heap *h){
     heapify_top_bottom(h, 0);
     return pop;
 }
-// void print(Heap *h){
-//     int i;
-//     printf("____________Print Heap_____________\n");
-//     for(i=0;i< h->count;i++){
-//         printf("-> %d ",h->arr[i]);
-//     }
-//     printf("->__/\\__\n");
-// }
 // void* get_arg(q_node *ar) {
 //     return ar->arg;
 // }
@@ -156,6 +160,18 @@ int get_max_threads(struct thread_pool *pool){
 }
 int get_schedule(struct thread_pool *pool){
     return pool->scheduled;
+}
+int get_count(struct thread_pool *pool){
+    return (pool->heap)->count;
+}
+void print_heap(struct thread_pool *pool) {
+    struct Heap *h=pool->heap;
+    int i;
+    printf("____________Print Heap_____________\n");
+    for(i=0;i< h->count;i++){
+        printf("-> %d ",h->arr[i]);
+    }
+    printf("->__/\\__\n");
 }
 // int get_head(struct thread_pool *pool){
 //     return (pool->q_head)% pool->TASK_Q_MAX;
@@ -183,10 +199,10 @@ void *worker_func(void *pool_arg){
         //assert(pool->q_head != pool->q_tail);
         task_picked = PopMin(pool->heap);
         pool->scheduled++; //task scheduled
-
+        printf("Size: %d\n",task_picked.size);
         pthread_mutex_unlock(&pool->mutex);
 
-        task_picked.routine(task_picked.arg);
+        task_picked.routine(task_picked.req);
 
         pthread_mutex_lock(&pool->mutex);
         
@@ -204,20 +220,27 @@ void *worker_func(void *pool_arg){
     return NULL;
 }
 
-void pool_add_task(struct thread_pool *pool, void *(*routine)(void*), void *arg){
+void pool_add_task(struct thread_pool *pool, void *(*routine)(void*), void *arg,void *tem){
+    // FILE *fptr;
+    // fptr = fopen("program.txt", "w");
+    // if(fptr == NULL)
+    // {
+    //     printf("Error!");
+    //     exit(1);
+    // }
+    // fprintf(fptr,"%d",size);
+    // fclose(fptr);
+    struct info* temp = (struct info*) tem;
     pthread_mutex_lock(&pool->mutex);
-
     if ((pool->heap)->count==0){
         pthread_cond_broadcast(&pool->task_available);
     }
-
     struct q_node task;
     task.routine = routine;
-    task.arg = arg;
-    task.size = getsize(arg);
-
+    // task.arg = arg;
+    task.size = temp->size;
+    task.req = temp;
     insert(pool->heap,task);
-
     pthread_mutex_unlock(&pool->mutex);
 }
 

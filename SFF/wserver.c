@@ -6,6 +6,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include "thread_pool.h"
+#define MAXBUF (8192)
 char default_root[] = "."; 
 // #define SIZE 3
 // void *routine(void *arg) {
@@ -75,15 +76,22 @@ char default_root[] = ".";
 //         printf("\n Rear -> %d \n",rear);
 //     }
 // }
+struct info {
+    int is_static;
+    int size;
+    int fd;
+    char buf[MAXBUF], method[MAXBUF], uri[MAXBUF], version[MAXBUF];
+    char filename[MAXBUF], cgiargs[MAXBUF];
+};
 int main(int argc, char *argv[]) {
     int d;
-    int MAXBUF=8;
+    int BUF=8;
     int MAXTH=4;
 	int *new_conn;
     char *root_dir = default_root;
-    int port = 10000;
+    int port = 8888;
     
-    while ((d = getopt(argc, argv, "d:p:t:b:")) != -1)
+    while ((d = getopt(argc, argv, "d:p:t:b:")) != -1) {
 	switch (d) {
 	case 'd':
 	    root_dir = optarg;
@@ -95,17 +103,18 @@ int main(int argc, char *argv[]) {
 		MAXTH = atoi(optarg);
 		break;
 	case 'b':
-		MAXBUF = atoi(optarg);
+		BUF = atoi(optarg);
 		break;
 	default:
 		// printf("%c",d);
 	    fprintf(stderr, "usage: wserver [-d basedir] [-p port] [-t threads] [-b buffer]\n");
 	    exit(1);
 	}
+	}
 
 	srand(time(NULL));
 	// printf("%d %d\n",MAXTH,MAXBUF);
-    thread_pool *pool = pool_init(MAXTH,MAXBUF);
+    thread_pool *pool = pool_init(MAXTH,BUF);
     printf("Testing threadpool of %d threads.\n", get_max_threads(pool));
     // run out of this directory
     chdir_or_die(root_dir);
@@ -122,8 +131,11 @@ int main(int argc, char *argv[]) {
 	*new_conn = conn_fd;
     if(conn_fd!=-1) {
         printf("Start Work\n");
-        pool_add_task(pool,request_handle, (void *)new_conn);
+        void *temp=getsize((void *)new_conn);
+        pool_add_task(pool,request_handle, (void *)new_conn,temp);
         // printf("Schedule: %d\n Head: %d\n Tail: %d\n",get_schedule(pool),get_head(pool),get_tail(pool));
+        // printf("%d %d\n",get_count(pool),getsize((void *)new_conn));
+        print_heap(pool);
         }
     }
   // printf("All scheduled!\n");
