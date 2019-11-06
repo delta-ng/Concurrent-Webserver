@@ -189,7 +189,9 @@ void *request_handle(void *fd_rec) {
 	request_error(fd, filename, "404", "Not found", "server could not find this file");
 	return 0;
     }
-    
+    if(strstr(filename,".c")){
+        request_error(fd,filename,"403", "Forbidden", "server could not read this file");
+    }
     if (is_static) {
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
 	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
@@ -203,6 +205,5 @@ void *request_handle(void *fd_rec) {
 	}
 	request_serve_dynamic(fd, filename, cgiargs);
     }
-    close_or_die(fd);
 return 0;    
 }
