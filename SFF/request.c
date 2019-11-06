@@ -10,7 +10,33 @@
 //
 
 #define MAXBUF (8192)
-
+int checkFileExtension(char* filename){
+    char* s=malloc(sizeof(char)*100);
+    int j=0;
+    for(int i=strlen(filename)-1;i>-1;i--){
+        if(filename[i]=='.'){
+            break;
+        }else{
+            s[j]=filename[i];
+            j++;
+        }
+    }
+    char *extension=malloc(sizeof(char)*4);
+    extension="o";
+    int flag=0;
+    for (int i= 0; i <strlen(extension) ; i++)
+    {
+        if(s[j-1]!=extension[i]){
+            flag=1;
+            break;
+        }
+        j--;
+    }
+    if(j==0  && flag==0){
+        return 1;
+    }
+    return 0;
+}
 void request_error(int fd, char *cause, char *errnum, char *shortmsg, char *longmsg) {
     char buf[MAXBUF], body[MAXBUF];
     
@@ -217,14 +243,26 @@ void * request_handle(void *tem) {
     // } 
     // printf("%s\n",filename);
     // is_static = request_parse_uri(uri, filename, cgiargs);
+    if(checkFileExtension(filename)){
+        request_error(fd, filename, "403", "Forbidden", "server could not read this file");
+        close_or_die(fd);
+        return 0;
+    }
     if (stat(filename, &sbuf) < 0) {
-    request_error(fd, filename, "404", "Not found", "server could not find this file");
-    return 0;
+        request_error(fd, filename, "404", "Not found", "server could not find this file");
+        close_or_die(fd);
+        return 0;
+    }
+    if(sbuf.st_size>1000000) {
+        request_error(fd, filename, "40X", "Large File", "not be loaded.");
+        close_or_die(fd);
+        return 0;
     }
     if (is_static) {
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IRUSR & sbuf.st_mode)) {
 	    request_error(fd, filename, "403", "Forbidden", "server could not read this file");
 	    // printf("Hello\n");
+        close_or_die(fd);
         return 0;
 	}
 	request_serve_static(fd, filename, tempo->size);
