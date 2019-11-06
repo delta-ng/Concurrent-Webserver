@@ -218,8 +218,7 @@ void *worker_func(void *pool_arg){
         task_picked.routine(&task_picked.req);
 
         pthread_mutex_lock(&pool->mutex);
-        
-        printf("Work Done %d",(task_picked.req).fd);
+        // printf("Work Done\n");
         
         pool->scheduled--;
 

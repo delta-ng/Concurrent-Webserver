@@ -228,6 +228,7 @@ void * request_handle(void *tem) {
         return 0;
 	}
 	request_serve_static(fd, filename, tempo->size);
+    printf("Work Done %d\n",fd);
     close_or_die(fd);
     } else {
 	if (!(S_ISREG(sbuf.st_mode)) || !(S_IXUSR & sbuf.st_mode)) {
@@ -235,7 +236,9 @@ void * request_handle(void *tem) {
 	    return 0;
 	}
 	request_serve_dynamic(fd, filename, cgiargs);
+    printf("Work Done %d\n",fd);
     close_or_die(fd);
     }
+
 return 0;    
 }
