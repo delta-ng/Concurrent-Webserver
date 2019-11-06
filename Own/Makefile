@@ -15,8 +15,8 @@ all: wserver wclient spin.cgi
 
 # thread_pool: thread_pool.o
 # 	$(CC) $(CFLAGS) -pthread -o thread_pool thread_pool.o
-# thread: thread_pool.o request.o io_helper.o
-# 	$(CC) $(CFLAGS) -pthread -o thread_pool thread_pool.o request.o io_helper.o
+#thread: thread_pool.o request.o io_helper.o
+	#$(CC) $(CFLAGS) -pthread -o thread_pool thread_pool.o request.o io_helper.o
 
 wserver: wserver.o request.o io_helper.o thread_pool.o
 	$(CC) $(CFLAGS) -pthread -o wserver wserver.o request.o io_helper.o thread_pool.o
