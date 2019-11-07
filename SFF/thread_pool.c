@@ -122,16 +122,10 @@ void heapify_top_bottom(Heap *h, int parent_node){
     }
 }
 void insert(Heap *h, struct q_node key){
-    // struct info* temp;
     if( h->count < h->capacity){
         h->arr[h->count] = key;
-        // temp=key.req;
-        // printf("Key :%d\n",temp->fd);
-        // temp=(h->arr[0]).req;
-        // printf("First :%d\n",temp->fd);
         heapify_bottom_top(h, h->count);
         h->count++;
-        // printf("%d\n",h->count);
     }
 }
 
@@ -233,15 +227,6 @@ void *worker_func(void *pool_arg){
 }
 
 void pool_add_task(struct thread_pool *pool, void *(*routine)(void*), void *arg,void *tem){
-    // FILE *fptr;
-    // fptr = fopen("program.txt", "w");
-    // if(fptr == NULL)
-    // {
-    //     printf("Error!");
-    //     exit(1);
-    // }
-    // fprintf(fptr,"%d",size);
-    // fclose(fptr);
     struct info* temp = (struct info*) tem;
     pthread_mutex_lock(&pool->mutex);
     if ((pool->heap)->count==0){
