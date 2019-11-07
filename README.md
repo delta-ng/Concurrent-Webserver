@@ -1,15 +1,6 @@
 # Overview
 
-In this assignment, you will be developing a concurrent web server. To
-simplify this project, we are providing you with the code for a non-concurrent
-(but working) web server. This basic web server operates with only a single
-thread; it will be your job to make the web server multi-threaded so that it
-can handle multiple requests at the same time.
-
-The goals of this project are:
-- To learn the basic architecture of a simple web server
-- To learn how to add concurrency to a non-concurrent system
-- To learn how to read and modify an existing code base effectively
+Base Model was taken from : [OSTEP-WEBSERVER](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-webserver)
 
 ## Command-line Parameters
 
