@@ -2,6 +2,19 @@
 
 Base Model was taken from : [OSTEP-WEBSERVER](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-webserver)
 
+
+# Base Model
+
+The base web server operates with only a single thread. It can serve only one client at a given time.
+
+# FIFO Model
+
+This web server is multi-threaded webserver so that it can handle multiple requests at the same time. Use the command line parameters to specify the number of threads. As the name suggests it serves a request in FCFS (First come First serve) basis.
+
+# SFF Model
+
+This web server is same as the FIFO Model but the requests are scheduled by the Shortest File First scheduling policy.
+
 ## Command-line Parameters
 
 Your C program must be invoked exactly as follows:
