@@ -12,7 +12,7 @@ This web server is same as the FIFO Model but the requests are scheduled by the 
 
 ## Command-line Parameters
 
-Your C program must be invoked exactly as follows:
+To run the webserver write the following code in your terminal.
 
 ```sh
 prompt> ./wserver [-d basedir] [-p port] [-t threads] [-b buffers]
@@ -37,7 +37,10 @@ prompt> server -d . -p 8003 -t 8 -b 1000
 ```
 
 In this case, your web server will listen to port 8003, create 8 worker threads for
-handling HTTP requests.
+handling HTTP requests. We have also given a script which sends multiple web client request.
+```
+prompt> ./client.sh
+```
 
 # Source Code Overview
 
