@@ -75,10 +75,10 @@ client code we gave you. You can even have the client code we gave you contact
 any other server that speaks HTTP.
 
 ## Contribution
-..* Prakash R
-..* Kavita Vaishnaw
-..* Kanishk Kalra 
-..* Shaurya Agarwal 
-..* Mohit Mina
+* Prakash R
+* Kavita Vaishnaw
+* Kanishk Kalra 
+* Shaurya Agarwal 
+* Mohit Mina
 
 
