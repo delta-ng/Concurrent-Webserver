@@ -42,7 +42,7 @@ handling HTTP requests. We have also given a script which sends multiple web cli
 prompt> ./client.sh
 ```
 
-# Source Code Overview
+## Source Code Overview
 
 We recommend understanding how the code that we gave you works.  We provide
 the following files:
@@ -74,7 +74,7 @@ server we gave you with your preferred web browser. Run this server with the
 client code we gave you. You can even have the client code we gave you contact
 any other server that speaks HTTP.
 
-##Contribution
+## Contribution
 ..* Prakash R
 ..* Kavita Vaishnaw
 ..* Kanishk Kalra 
