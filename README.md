@@ -75,10 +75,10 @@ client code we gave you. You can even have the client code we gave you contact
 any other server that speaks HTTP.
 
 ## Contribution
-* (Prakash R)[https://github.com/delta-ng]
-* (Kavita Vaishnaw)[https://github.com/kavita-v]
-* (Kanishk Kalra)[https://github.com/kanishkkalra11]
-* (Shaurya Agarwal)[https://github.com/devShaurya]
-* (Mohit Mina)[https://github.com/mohitmina]
+* [Prakash R](https://github.com/delta-ng)
+* [Kavita Vaishnaw](https://github.com/kavita-v)
+* [Kanishk Kalra](https://github.com/kanishkkalra11)
+* [Shaurya Agarwal](https://github.com/devShaurya)
+* [Mohit Mina](https://github.com/mohitmina)
 
 
