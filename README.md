@@ -1,6 +1,6 @@
 # Base Model
 
-Base Model was taken from : [OSTEP-WEBSERVER](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-webserver).The base web server operates with only a single thread. It can serve only one client at a given time.
+Base Model was taken from : [OSTEP-WEBSERVER](https://github.com/remzi-arpacidusseau/ostep-projects/tree/master/concurrency-webserver). The base web server operates with only a single thread. It can serve only one client at a given time.
 
 # FIFO Model
 
@@ -33,7 +33,7 @@ follows.
 
 For example, you could run your program as:
 ```
-prompt> server -d . -p 8003 -t 8 -b 1000
+prompt> ./wserver -d . -p 8003 -t 8 -b 1000
 ```
 
 In this case, your web server will listen to port 8003, create 8 worker threads for
@@ -73,4 +73,12 @@ The best way to learn about the code is to compile it and run it. Run the
 server we gave you with your preferred web browser. Run this server with the
 client code we gave you. You can even have the client code we gave you contact
 any other server that speaks HTTP.
+
+##Contribution
+..* Prakash R
+..* Kavita Vaishnaw
+..* Kanishk Kalra 
+..* Shaurya Agarwal 
+..* Mohit Mina
+
 
