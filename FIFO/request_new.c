@@ -2,9 +2,6 @@
 #include "request.h"
 #include <pthread.h>
 #include <time.h>
-// Some of this code stolen from Bryant/O'Halloran
-// Hopefully this is not a problem ... :)
-//
 
 #define MAXBUF (8192)
 
