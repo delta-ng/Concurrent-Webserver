@@ -5,9 +5,7 @@
 #include <unistd.h>
 #include <sys/stat.h>
 #include <string.h>
-// Some of this code stolen from Bryant/O'Halloran
-// Hopefully this is not a problem ... :)
-//
+
 
 #define MAXBUF (8192)
 int checkFileExtension(char* filename){
