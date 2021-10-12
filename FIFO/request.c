@@ -4,10 +4,6 @@
 #include <stdlib.h> 
 #include <unistd.h>
 #include <sys/stat.h>
-//
-// Some of this code stolen from Bryant/O'Halloran
-// Hopefully this is not a problem ... :)
-//
 
 #define MAXBUF (8192)
 
